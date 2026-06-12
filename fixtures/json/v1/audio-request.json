@@ -1,0 +1,12 @@
+{
+  "sessionId": "session-1",
+  "sequence": "1",
+  "sentAtUnixMs": "0",
+  "audio": {
+    "audioPath": "/tmp/song.wav",
+    "audioLengthMs": 180000,
+    "musicSource": "MUSIC_SOURCE_BACKGROUND",
+    "difficulty": 4,
+    "route": "INFERENCE_ROUTE_MAPPER"
+  }
+}

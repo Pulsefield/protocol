@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package pulsefield.protocol.v1;
+
+message Envelope {
+  string session_id = 1;
+  uint64 sequence = 2;
+  int64 sent_at_unix_ms = 3;
+
+  oneof payload {
+    ReadyRequest ready = 10;
+    AudioRequest audio = 11;
+    ReferenceTimeRequest reference_time = 12;
+    StopSessionRequest stop_session = 13;
+    HitObjectTokenEvent hit_object_token = 20;
+    ErrorEvent error = 21;
+    StatusEvent status = 22;
+  }
+}
+
+message ReadyRequest {}
+
+message AudioRequest {
+  string audio_path = 1;
+  optional uint32 audio_length_ms = 2;
+  MusicSource music_source = 3;
+  optional double difficulty = 4;
+  InferenceRoute route = 5;
+}
+
+message ReferenceTimeRequest {
+  uint32 ref_time_ms = 1;
+  double local_host_time_send_ms = 2;
+  optional uint32 audio_length_ms = 3;
+}
+
+message StopSessionRequest {
+  string reason = 1;
+}
+
+message HitObjectTokenEvent {
+  uint32 token_id = 1;
+  uint32 ms_in_ref_audio = 2;
+}
+
+message ErrorEvent {
+  string code = 1;
+  string message = 2;
+}
+
+message StatusEvent {
+  EndpointStatus status = 1;
+  string message = 2;
+  uint32 ref_time_ms = 3;
+  double local_host_time_ms = 4;
+}
+
+enum MusicSource {
+  MUSIC_SOURCE_UNSPECIFIED = 0;
+  MUSIC_SOURCE_BACKGROUND = 1;
+  MUSIC_SOURCE_SYSTEM_AUDIO = 2;
+}
+
+enum InferenceRoute {
+  INFERENCE_ROUTE_UNSPECIFIED = 0;
+  INFERENCE_ROUTE_MAPPER = 1;
+  INFERENCE_ROUTE_TIMING_MOCK = 2;
+}
+
+enum EndpointStatus {
+  ENDPOINT_STATUS_UNSPECIFIED = 0;
+  ENDPOINT_STATUS_READY = 1;
+  ENDPOINT_STATUS_AUDIO_PREPARING = 2;
+  ENDPOINT_STATUS_AUDIO_READY = 3;
+  ENDPOINT_STATUS_STREAMING = 4;
+  ENDPOINT_STATUS_STOPPED = 5;
+}

@@ -1,0 +1,9 @@
+{
+  "sessionId": "session-1",
+  "sequence": "2",
+  "sentAtUnixMs": "0",
+  "hitObjectToken": {
+    "tokenId": 30,
+    "msInRefAudio": 1234
+  }
+}

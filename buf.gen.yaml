@@ -1,0 +1,13 @@
+version: v2
+clean: true
+inputs:
+  - directory: proto
+plugins:
+  - remote: buf.build/apple/swift:v1.38.0
+    out: gen/swift
+    opt:
+      - Visibility=Public
+  - remote: buf.build/protocolbuffers/python:v26.1
+    out: gen/python
+  - remote: buf.build/protocolbuffers/pyi:v26.1
+    out: gen/python

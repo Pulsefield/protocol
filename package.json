@@ -1,0 +1,51 @@
+{
+  "name": "@pulsefield/protocol",
+  "version": "0.0.1",
+  "description": "Shared Protocol Buffers contracts for Pulsefield clients and model services.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "packageManager": "npm@11.12.1",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=11.0.0"
+  },
+  "exports": {
+    "./proto/*": "./proto/*",
+    "./gen/swift/*": "./gen/swift/*",
+    "./gen/python/*": "./gen/python/*",
+    "./fixtures/*": "./fixtures/*",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "tools": "node --version && npm --version && buf --version && tsc --version && vitest --version && prettier --version",
+    "proto:format": "buf format -w proto",
+    "proto:lint": "buf lint",
+    "proto:generate": "buf generate",
+    "check": "buf lint && tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  },
+  "keywords": [
+    "pulsefield",
+    "protobuf",
+    "protocol"
+  ],
+  "author": "",
+  "files": [
+    "proto",
+    "gen",
+    "fixtures",
+    "buf.yaml",
+    "buf.gen.yaml",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@bufbuild/buf": "1.70.0",
+    "@types/node": "25.9.3",
+    "prettier": "3.8.4",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8"
+  }
+}
