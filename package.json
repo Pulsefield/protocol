@@ -1,13 +1,21 @@
 {
   "name": "@pulsefield/protocol",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Shared Protocol Buffers contracts for Pulsefield clients and model services.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pulsefield/protocol.git"
+  },
   "type": "module",
   "license": "Apache-2.0",
   "packageManager": "npm@11.12.1",
   "engines": {
     "node": ">=22.0.0",
     "npm": ">=11.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "exports": {
     "./proto/*": "./proto/*",
