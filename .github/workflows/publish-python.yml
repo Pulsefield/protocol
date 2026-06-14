@@ -1,0 +1,56 @@
+name: Publish Python package
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  npm_config_audit: "false"
+  npm_config_fund: "false"
+  npm_config_prefer_offline: "true"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - run: npm ci
+      - run: npm run check
+      - run: python -m pip install build
+      - run: python -m build --sdist --wheel --outdir dist/
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: python-dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: pypi
+
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          name: python-dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1

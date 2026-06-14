@@ -12,35 +12,18 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
+from pulsefield.protocol.v1 import core_pb2 as pulsefield_dot_protocol_dot_v1_dot_core__pb2
+from pulsefield.protocol.v1 import inference_pb2 as pulsefield_dot_protocol_dot_v1_dot_inference__pb2
+from pulsefield.protocol.v1 import mapper_pb2 as pulsefield_dot_protocol_dot_v1_dot_mapper__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n%pulsefield/protocol/v1/envelope.proto\x12\x16pulsefield.protocol.v1\"\xef\x04\n\x08\x45nvelope\x12\x1d\n\nsession_id\x18\x01 \x01(\tR\tsessionId\x12\x1a\n\x08sequence\x18\x02 \x01(\x04R\x08sequence\x12%\n\x0fsent_at_unix_ms\x18\x03 \x01(\x03R\x0csentAtUnixMs\x12<\n\x05ready\x18\n \x01(\x0b\x32$.pulsefield.protocol.v1.ReadyRequestH\x00R\x05ready\x12<\n\x05\x61udio\x18\x0b \x01(\x0b\x32$.pulsefield.protocol.v1.AudioRequestH\x00R\x05\x61udio\x12U\n\x0ereference_time\x18\x0c \x01(\x0b\x32,.pulsefield.protocol.v1.ReferenceTimeRequestH\x00R\rreferenceTime\x12O\n\x0cstop_session\x18\r \x01(\x0b\x32*.pulsefield.protocol.v1.StopSessionRequestH\x00R\x0bstopSession\x12W\n\x10hit_object_token\x18\x14 \x01(\x0b\x32+.pulsefield.protocol.v1.HitObjectTokenEventH\x00R\x0ehitObjectToken\x12:\n\x05\x65rror\x18\x15 \x01(\x0b\x32\".pulsefield.protocol.v1.ErrorEventH\x00R\x05\x65rror\x12=\n\x06status\x18\x16 \x01(\x0b\x32#.pulsefield.protocol.v1.StatusEventH\x00R\x06statusB\t\n\x07payload\"\x0e\n\x0cReadyRequest\"\xa8\x02\n\x0c\x41udioRequest\x12\x1d\n\naudio_path\x18\x01 \x01(\tR\taudioPath\x12+\n\x0f\x61udio_length_ms\x18\x02 \x01(\rH\x00R\raudioLengthMs\x88\x01\x01\x12\x46\n\x0cmusic_source\x18\x03 \x01(\x0e\x32#.pulsefield.protocol.v1.MusicSourceR\x0bmusicSource\x12#\n\ndifficulty\x18\x04 \x01(\x01H\x01R\ndifficulty\x88\x01\x01\x12<\n\x05route\x18\x05 \x01(\x0e\x32&.pulsefield.protocol.v1.InferenceRouteR\x05routeB\x12\n\x10_audio_length_msB\r\n\x0b_difficulty\"\xad\x01\n\x14ReferenceTimeRequest\x12\x1e\n\x0bref_time_ms\x18\x01 \x01(\rR\trefTimeMs\x12\x34\n\x17local_host_time_send_ms\x18\x02 \x01(\x01R\x13localHostTimeSendMs\x12+\n\x0f\x61udio_length_ms\x18\x03 \x01(\rH\x00R\raudioLengthMs\x88\x01\x01\x42\x12\n\x10_audio_length_ms\",\n\x12StopSessionRequest\x12\x16\n\x06reason\x18\x01 \x01(\tR\x06reason\"W\n\x13HitObjectTokenEvent\x12\x19\n\x08token_id\x18\x01 \x01(\rR\x07tokenId\x12%\n\x0fms_in_ref_audio\x18\x02 \x01(\rR\x0cmsInRefAudio\":\n\nErrorEvent\x12\x12\n\x04\x63ode\x18\x01 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\"\xb4\x01\n\x0bStatusEvent\x12>\n\x06status\x18\x01 \x01(\x0e\x32&.pulsefield.protocol.v1.EndpointStatusR\x06status\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12\x1e\n\x0bref_time_ms\x18\x03 \x01(\rR\trefTimeMs\x12+\n\x12local_host_time_ms\x18\x04 \x01(\x01R\x0flocalHostTimeMs*g\n\x0bMusicSource\x12\x1c\n\x18MUSIC_SOURCE_UNSPECIFIED\x10\x00\x12\x1b\n\x17MUSIC_SOURCE_BACKGROUND\x10\x01\x12\x1d\n\x19MUSIC_SOURCE_SYSTEM_AUDIO\x10\x02*n\n\x0eInferenceRoute\x12\x1f\n\x1bINFERENCE_ROUTE_UNSPECIFIED\x10\x00\x12\x1a\n\x16INFERENCE_ROUTE_MAPPER\x10\x01\x12\x1f\n\x1bINFERENCE_ROUTE_TIMING_MOCK\x10\x02*\xce\x01\n\x0e\x45ndpointStatus\x12\x1f\n\x1b\x45NDPOINT_STATUS_UNSPECIFIED\x10\x00\x12\x19\n\x15\x45NDPOINT_STATUS_READY\x10\x01\x12#\n\x1f\x45NDPOINT_STATUS_AUDIO_PREPARING\x10\x02\x12\x1f\n\x1b\x45NDPOINT_STATUS_AUDIO_READY\x10\x03\x12\x1d\n\x19\x45NDPOINT_STATUS_STREAMING\x10\x04\x12\x1b\n\x17\x45NDPOINT_STATUS_STOPPED\x10\x05\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n%pulsefield/protocol/v1/envelope.proto\x12\x16pulsefield.protocol.v1\x1a!pulsefield/protocol/v1/core.proto\x1a&pulsefield/protocol/v1/inference.proto\x1a#pulsefield/protocol/v1/mapper.proto\"\xf7\x07\n\x08\x45nvelope\x12\x1d\n\nsession_id\x18\x01 \x01(\tR\tsessionId\x12\x1a\n\x08sequence\x18\x02 \x01(\x04R\x08sequence\x12%\n\x0fsent_at_unix_ms\x18\x03 \x01(\x03R\x0csentAtUnixMs\x12$\n\x0esource_node_id\x18\x04 \x01(\tR\x0csourceNodeId\x12$\n\x0etarget_node_id\x18\x05 \x01(\tR\x0ctargetNodeId\x12\x1d\n\nmessage_id\x18\x06 \x01(\tR\tmessageId\x12%\n\x0e\x63orrelation_id\x18\x07 \x01(\tR\rcorrelationId\x12\x42\n\nnode_hello\x18\x08 \x01(\x0b\x32!.pulsefield.protocol.v1.NodeHelloH\x00R\tnodeHello\x12<\n\x05ready\x18\n \x01(\x0b\x32$.pulsefield.protocol.v1.ReadyRequestH\x00R\x05ready\x12<\n\x05\x61udio\x18\x0b \x01(\x0b\x32$.pulsefield.protocol.v1.AudioRequestH\x00R\x05\x61udio\x12U\n\x0ereference_time\x18\x0c \x01(\x0b\x32,.pulsefield.protocol.v1.ReferenceTimeRequestH\x00R\rreferenceTime\x12O\n\x0cstop_session\x18\r \x01(\x0b\x32*.pulsefield.protocol.v1.StopSessionRequestH\x00R\x0bstopSession\x12`\n\x13mapper_stream_begin\x18\x13 \x01(\x0b\x32..pulsefield.protocol.v1.MapperStreamBeginEventH\x00R\x11mapperStreamBegin\x12W\n\x10hit_object_token\x18\x14 \x01(\x0b\x32+.pulsefield.protocol.v1.HitObjectTokenEventH\x00R\x0ehitObjectToken\x12:\n\x05\x65rror\x18\x15 \x01(\x0b\x32\".pulsefield.protocol.v1.ErrorEventH\x00R\x05\x65rror\x12=\n\x06status\x18\x16 \x01(\x0b\x32#.pulsefield.protocol.v1.StatusEventH\x00R\x06status\x12N\n\rend_of_stream\x18\x17 \x01(\x0b\x32(.pulsefield.protocol.v1.EndOfStreamEventH\x00R\x0b\x65ndOfStreamB\t\n\x07payloadb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'pulsefield.protocol.v1.envelope_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_MUSICSOURCE']._serialized_start=1560
-  _globals['_MUSICSOURCE']._serialized_end=1663
-  _globals['_INFERENCEROUTE']._serialized_start=1665
-  _globals['_INFERENCEROUTE']._serialized_end=1775
-  _globals['_ENDPOINTSTATUS']._serialized_start=1778
-  _globals['_ENDPOINTSTATUS']._serialized_end=1984
-  _globals['_ENVELOPE']._serialized_start=66
-  _globals['_ENVELOPE']._serialized_end=689
-  _globals['_READYREQUEST']._serialized_start=691
-  _globals['_READYREQUEST']._serialized_end=705
-  _globals['_AUDIOREQUEST']._serialized_start=708
-  _globals['_AUDIOREQUEST']._serialized_end=1004
-  _globals['_REFERENCETIMEREQUEST']._serialized_start=1007
-  _globals['_REFERENCETIMEREQUEST']._serialized_end=1180
-  _globals['_STOPSESSIONREQUEST']._serialized_start=1182
-  _globals['_STOPSESSIONREQUEST']._serialized_end=1226
-  _globals['_HITOBJECTTOKENEVENT']._serialized_start=1228
-  _globals['_HITOBJECTTOKENEVENT']._serialized_end=1315
-  _globals['_ERROREVENT']._serialized_start=1317
-  _globals['_ERROREVENT']._serialized_end=1375
-  _globals['_STATUSEVENT']._serialized_start=1378
-  _globals['_STATUSEVENT']._serialized_end=1558
+  _globals['_ENVELOPE']._serialized_start=178
+  _globals['_ENVELOPE']._serialized_end=1193
 # @@protoc_insertion_point(module_scope)

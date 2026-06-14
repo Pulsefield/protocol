@@ -1,6 +1,6 @@
 {
   "name": "@pulsefield/protocol",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Shared Protocol Buffers contracts for Pulsefield clients and model services.",
   "repository": {
     "type": "git",
@@ -21,16 +21,21 @@
     "./proto/*": "./proto/*",
     "./gen/swift/*": "./gen/swift/*",
     "./gen/python/*": "./gen/python/*",
-    "./fixtures/*": "./fixtures/*",
+    "./docs/*": "./docs/*",
     "./package.json": "./package.json"
   },
   "scripts": {
-    "tools": "node --version && npm --version && buf --version && tsc --version && vitest --version && prettier --version",
+    "tools": "node --version && npm --version && buf --version && prettier --version",
+    "generate": "npm run proto:generate",
     "proto:format": "buf format -w proto",
     "proto:lint": "buf lint",
-    "proto:generate": "buf generate",
-    "check": "buf lint && tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests",
+    "proto:generate": "buf generate && node tools/ensure-python-typed.mjs",
+    "generated:check": "node tools/check-generated.mjs",
+    "check": "buf lint && npm run generated:check",
+    "bootstrap:check": "npm run check && npm run python:check && npm run swift:build",
+    "python:check": "node tools/check-python-package.mjs",
+    "python:build": "python3 -m build --sdist --wheel --outdir dist/",
+    "swift:build": "swift build",
     "format": "prettier --check .",
     "format:write": "prettier --write ."
   },
@@ -43,17 +48,18 @@
   "files": [
     "proto",
     "gen",
-    "fixtures",
+    "docs",
+    "tools",
     "buf.yaml",
     "buf.gen.yaml",
+    "Package.swift",
+    "pyproject.toml",
     "README.md",
+    "PROTOCOL_GUIDELINES.md",
     "LICENSE"
   ],
   "devDependencies": {
     "@bufbuild/buf": "1.70.0",
-    "@types/node": "25.9.3",
-    "prettier": "3.8.4",
-    "typescript": "6.0.3",
-    "vitest": "4.1.8"
+    "prettier": "3.8.4"
   }
 }

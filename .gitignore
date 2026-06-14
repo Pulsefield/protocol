@@ -30,6 +30,7 @@ node_modules/
 vendor/
 
 # Build and cache output
+.build/
 dist/
 build/
 out/
@@ -44,15 +45,20 @@ coverage/
 # Python
 __pycache__/
 *.py[cod]
+*.egg-info/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .venv/
 venv/
 
+# SwiftPM
+.swiftpm/
+Package.resolved
+
 # Package manager noise
+*.tgz
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-

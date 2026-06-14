@@ -20,787 +20,451 @@ fileprivate nonisolated struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobu
   typealias Version = _2
 }
 
-public nonisolated enum Pulsefield_Protocol_V1_MusicSource: SwiftProtobuf.Enum, Swift.CaseIterable {
-  public typealias RawValue = Int
-  case unspecified // = 0
-  case background // = 1
-  case systemAudio // = 2
-  case UNRECOGNIZED(Int)
-
-  public init() {
-    self = .unspecified
-  }
-
-  public init?(rawValue: Int) {
-    switch rawValue {
-    case 0: self = .unspecified
-    case 1: self = .background
-    case 2: self = .systemAudio
-    default: self = .UNRECOGNIZED(rawValue)
-    }
-  }
-
-  public var rawValue: Int {
-    switch self {
-    case .unspecified: return 0
-    case .background: return 1
-    case .systemAudio: return 2
-    case .UNRECOGNIZED(let i): return i
-    }
-  }
-
-  // The compiler won't synthesize support with the UNRECOGNIZED case.
-  public static let allCases: [Pulsefield_Protocol_V1_MusicSource] = [
-    .unspecified,
-    .background,
-    .systemAudio,
-  ]
-
-}
-
-public nonisolated enum Pulsefield_Protocol_V1_InferenceRoute: SwiftProtobuf.Enum, Swift.CaseIterable {
-  public typealias RawValue = Int
-  case unspecified // = 0
-  case mapper // = 1
-  case timingMock // = 2
-  case UNRECOGNIZED(Int)
-
-  public init() {
-    self = .unspecified
-  }
-
-  public init?(rawValue: Int) {
-    switch rawValue {
-    case 0: self = .unspecified
-    case 1: self = .mapper
-    case 2: self = .timingMock
-    default: self = .UNRECOGNIZED(rawValue)
-    }
-  }
-
-  public var rawValue: Int {
-    switch self {
-    case .unspecified: return 0
-    case .mapper: return 1
-    case .timingMock: return 2
-    case .UNRECOGNIZED(let i): return i
-    }
-  }
-
-  // The compiler won't synthesize support with the UNRECOGNIZED case.
-  public static let allCases: [Pulsefield_Protocol_V1_InferenceRoute] = [
-    .unspecified,
-    .mapper,
-    .timingMock,
-  ]
-
-}
-
-public nonisolated enum Pulsefield_Protocol_V1_EndpointStatus: SwiftProtobuf.Enum, Swift.CaseIterable {
-  public typealias RawValue = Int
-  case unspecified // = 0
-  case ready // = 1
-  case audioPreparing // = 2
-  case audioReady // = 3
-  case streaming // = 4
-  case stopped // = 5
-  case UNRECOGNIZED(Int)
-
-  public init() {
-    self = .unspecified
-  }
-
-  public init?(rawValue: Int) {
-    switch rawValue {
-    case 0: self = .unspecified
-    case 1: self = .ready
-    case 2: self = .audioPreparing
-    case 3: self = .audioReady
-    case 4: self = .streaming
-    case 5: self = .stopped
-    default: self = .UNRECOGNIZED(rawValue)
-    }
-  }
-
-  public var rawValue: Int {
-    switch self {
-    case .unspecified: return 0
-    case .ready: return 1
-    case .audioPreparing: return 2
-    case .audioReady: return 3
-    case .streaming: return 4
-    case .stopped: return 5
-    case .UNRECOGNIZED(let i): return i
-    }
-  }
-
-  // The compiler won't synthesize support with the UNRECOGNIZED case.
-  public static let allCases: [Pulsefield_Protocol_V1_EndpointStatus] = [
-    .unspecified,
-    .ready,
-    .audioPreparing,
-    .audioReady,
-    .streaming,
-    .stopped,
-  ]
-
-}
-
-public nonisolated struct Pulsefield_Protocol_V1_Envelope: Sendable {
+/// Transport-agnostic binary envelope shared by Pulsefield nodes.
+public nonisolated struct Pulsefield_Protocol_V1_Envelope: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var sessionID: String = String()
+  /// Inference/play session identifier. Empty for node-level or graph-level messages.
+  public var sessionID: String {
+    get {_storage._sessionID}
+    set {_uniqueStorage()._sessionID = newValue}
+  }
 
-  public var sequence: UInt64 = 0
+  /// Sender-local monotonic sequence number within a session. per source_node_id + session_id
+  public var sequence: UInt64 {
+    get {_storage._sequence}
+    set {_uniqueStorage()._sequence = newValue}
+  }
 
-  public var sentAtUnixMs: Int64 = 0
+  /// Sender wall-clock timestamp in Unix milliseconds, when available.
+  public var sentAtUnixMs: Int64 {
+    get {_storage._sentAtUnixMs}
+    set {_uniqueStorage()._sentAtUnixMs = newValue}
+  }
 
-  public var payload: Pulsefield_Protocol_V1_Envelope.OneOf_Payload? = nil
+  /// Node that produced this envelope, when the transport has graph identity.
+  public var sourceNodeID: String {
+    get {_storage._sourceNodeID}
+    set {_uniqueStorage()._sourceNodeID = newValue}
+  }
+
+  /// Intended recipient node. Empty means the session or transport decides routing.
+  public var targetNodeID: String {
+    get {_storage._targetNodeID}
+    set {_uniqueStorage()._targetNodeID = newValue}
+  }
+
+  /// globally unique enough, sender-generated
+  public var messageID: String {
+    get {_storage._messageID}
+    set {_uniqueStorage()._messageID = newValue}
+  }
+
+  /// Related message or request identifier for response and stream correlation.
+  public var correlationID: String {
+    get {_storage._correlationID}
+    set {_uniqueStorage()._correlationID = newValue}
+  }
+
+  public var payload: OneOf_Payload? {
+    get {return _storage._payload}
+    set {_uniqueStorage()._payload = newValue}
+  }
+
+  /// Graph identity announcement, usually sent before domain-specific traffic.
+  public var nodeHello: Pulsefield_Protocol_V1_NodeHello {
+    get {
+      if case .nodeHello(let v)? = _storage._payload {return v}
+      return Pulsefield_Protocol_V1_NodeHello()
+    }
+    set {_uniqueStorage()._payload = .nodeHello(newValue)}
+  }
 
   public var ready: Pulsefield_Protocol_V1_ReadyRequest {
     get {
-      if case .ready(let v)? = payload {return v}
+      if case .ready(let v)? = _storage._payload {return v}
       return Pulsefield_Protocol_V1_ReadyRequest()
     }
-    set {payload = .ready(newValue)}
+    set {_uniqueStorage()._payload = .ready(newValue)}
   }
 
   public var audio: Pulsefield_Protocol_V1_AudioRequest {
     get {
-      if case .audio(let v)? = payload {return v}
+      if case .audio(let v)? = _storage._payload {return v}
       return Pulsefield_Protocol_V1_AudioRequest()
     }
-    set {payload = .audio(newValue)}
+    set {_uniqueStorage()._payload = .audio(newValue)}
   }
 
   public var referenceTime: Pulsefield_Protocol_V1_ReferenceTimeRequest {
     get {
-      if case .referenceTime(let v)? = payload {return v}
+      if case .referenceTime(let v)? = _storage._payload {return v}
       return Pulsefield_Protocol_V1_ReferenceTimeRequest()
     }
-    set {payload = .referenceTime(newValue)}
+    set {_uniqueStorage()._payload = .referenceTime(newValue)}
   }
 
   public var stopSession: Pulsefield_Protocol_V1_StopSessionRequest {
     get {
-      if case .stopSession(let v)? = payload {return v}
+      if case .stopSession(let v)? = _storage._payload {return v}
       return Pulsefield_Protocol_V1_StopSessionRequest()
     }
-    set {payload = .stopSession(newValue)}
+    set {_uniqueStorage()._payload = .stopSession(newValue)}
+  }
+
+  /// One mapper token event. The legacy JSON transport calls this hitobject_tokens.
+  public var mapperStreamBegin: Pulsefield_Protocol_V1_MapperStreamBeginEvent {
+    get {
+      if case .mapperStreamBegin(let v)? = _storage._payload {return v}
+      return Pulsefield_Protocol_V1_MapperStreamBeginEvent()
+    }
+    set {_uniqueStorage()._payload = .mapperStreamBegin(newValue)}
   }
 
   public var hitObjectToken: Pulsefield_Protocol_V1_HitObjectTokenEvent {
     get {
-      if case .hitObjectToken(let v)? = payload {return v}
+      if case .hitObjectToken(let v)? = _storage._payload {return v}
       return Pulsefield_Protocol_V1_HitObjectTokenEvent()
     }
-    set {payload = .hitObjectToken(newValue)}
+    set {_uniqueStorage()._payload = .hitObjectToken(newValue)}
   }
 
   public var error: Pulsefield_Protocol_V1_ErrorEvent {
     get {
-      if case .error(let v)? = payload {return v}
+      if case .error(let v)? = _storage._payload {return v}
       return Pulsefield_Protocol_V1_ErrorEvent()
     }
-    set {payload = .error(newValue)}
+    set {_uniqueStorage()._payload = .error(newValue)}
   }
 
   public var status: Pulsefield_Protocol_V1_StatusEvent {
     get {
-      if case .status(let v)? = payload {return v}
+      if case .status(let v)? = _storage._payload {return v}
       return Pulsefield_Protocol_V1_StatusEvent()
     }
-    set {payload = .status(newValue)}
+    set {_uniqueStorage()._payload = .status(newValue)}
+  }
+
+  public var endOfStream: Pulsefield_Protocol_V1_EndOfStreamEvent {
+    get {
+      if case .endOfStream(let v)? = _storage._payload {return v}
+      return Pulsefield_Protocol_V1_EndOfStreamEvent()
+    }
+    set {_uniqueStorage()._payload = .endOfStream(newValue)}
   }
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public nonisolated enum OneOf_Payload: Equatable, Sendable {
+    /// Graph identity announcement, usually sent before domain-specific traffic.
+    case nodeHello(Pulsefield_Protocol_V1_NodeHello)
     case ready(Pulsefield_Protocol_V1_ReadyRequest)
     case audio(Pulsefield_Protocol_V1_AudioRequest)
     case referenceTime(Pulsefield_Protocol_V1_ReferenceTimeRequest)
     case stopSession(Pulsefield_Protocol_V1_StopSessionRequest)
+    /// One mapper token event. The legacy JSON transport calls this hitobject_tokens.
+    case mapperStreamBegin(Pulsefield_Protocol_V1_MapperStreamBeginEvent)
     case hitObjectToken(Pulsefield_Protocol_V1_HitObjectTokenEvent)
     case error(Pulsefield_Protocol_V1_ErrorEvent)
     case status(Pulsefield_Protocol_V1_StatusEvent)
+    case endOfStream(Pulsefield_Protocol_V1_EndOfStreamEvent)
 
   }
 
   public init() {}
-}
 
-public nonisolated struct Pulsefield_Protocol_V1_ReadyRequest: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
-public nonisolated struct Pulsefield_Protocol_V1_AudioRequest: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var audioPath: String = String()
-
-  public var audioLengthMs: UInt32 {
-    get {_audioLengthMs ?? 0}
-    set {_audioLengthMs = newValue}
-  }
-  /// Returns true if `audioLengthMs` has been explicitly set.
-  public var hasAudioLengthMs: Bool {self._audioLengthMs != nil}
-  /// Clears the value of `audioLengthMs`. Subsequent reads from it will return its default value.
-  public mutating func clearAudioLengthMs() {self._audioLengthMs = nil}
-
-  public var musicSource: Pulsefield_Protocol_V1_MusicSource = .unspecified
-
-  public var difficulty: Double {
-    get {_difficulty ?? 0}
-    set {_difficulty = newValue}
-  }
-  /// Returns true if `difficulty` has been explicitly set.
-  public var hasDifficulty: Bool {self._difficulty != nil}
-  /// Clears the value of `difficulty`. Subsequent reads from it will return its default value.
-  public mutating func clearDifficulty() {self._difficulty = nil}
-
-  public var route: Pulsefield_Protocol_V1_InferenceRoute = .unspecified
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-
-  fileprivate var _audioLengthMs: UInt32? = nil
-  fileprivate var _difficulty: Double? = nil
-}
-
-public nonisolated struct Pulsefield_Protocol_V1_ReferenceTimeRequest: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var refTimeMs: UInt32 = 0
-
-  public var localHostTimeSendMs: Double = 0
-
-  public var audioLengthMs: UInt32 {
-    get {_audioLengthMs ?? 0}
-    set {_audioLengthMs = newValue}
-  }
-  /// Returns true if `audioLengthMs` has been explicitly set.
-  public var hasAudioLengthMs: Bool {self._audioLengthMs != nil}
-  /// Clears the value of `audioLengthMs`. Subsequent reads from it will return its default value.
-  public mutating func clearAudioLengthMs() {self._audioLengthMs = nil}
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-
-  fileprivate var _audioLengthMs: UInt32? = nil
-}
-
-public nonisolated struct Pulsefield_Protocol_V1_StopSessionRequest: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var reason: String = String()
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
-public nonisolated struct Pulsefield_Protocol_V1_HitObjectTokenEvent: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var tokenID: UInt32 = 0
-
-  public var msInRefAudio: UInt32 = 0
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
-public nonisolated struct Pulsefield_Protocol_V1_ErrorEvent: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var code: String = String()
-
-  public var message: String = String()
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
-public nonisolated struct Pulsefield_Protocol_V1_StatusEvent: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var status: Pulsefield_Protocol_V1_EndpointStatus = .unspecified
-
-  public var message: String = String()
-
-  public var refTimeMs: UInt32 = 0
-
-  public var localHostTimeMs: Double = 0
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
+  fileprivate var _storage = _StorageClass.defaultInstance
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate nonisolated let _protobuf_package = "pulsefield.protocol.v1"
 
-nonisolated extension Pulsefield_Protocol_V1_MusicSource: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0MUSIC_SOURCE_UNSPECIFIED\0\u{1}MUSIC_SOURCE_BACKGROUND\0\u{1}MUSIC_SOURCE_SYSTEM_AUDIO\0")
-}
-
-nonisolated extension Pulsefield_Protocol_V1_InferenceRoute: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0INFERENCE_ROUTE_UNSPECIFIED\0\u{1}INFERENCE_ROUTE_MAPPER\0\u{1}INFERENCE_ROUTE_TIMING_MOCK\0")
-}
-
-nonisolated extension Pulsefield_Protocol_V1_EndpointStatus: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0ENDPOINT_STATUS_UNSPECIFIED\0\u{1}ENDPOINT_STATUS_READY\0\u{1}ENDPOINT_STATUS_AUDIO_PREPARING\0\u{1}ENDPOINT_STATUS_AUDIO_READY\0\u{1}ENDPOINT_STATUS_STREAMING\0\u{1}ENDPOINT_STATUS_STOPPED\0")
-}
-
 nonisolated extension Pulsefield_Protocol_V1_Envelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Envelope"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}session_id\0\u{1}sequence\0\u{3}sent_at_unix_ms\0\u{2}\u{7}ready\0\u{1}audio\0\u{3}reference_time\0\u{3}stop_session\0\u{4}\u{7}hit_object_token\0\u{1}error\0\u{1}status\0")
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}session_id\0\u{1}sequence\0\u{3}sent_at_unix_ms\0\u{3}source_node_id\0\u{3}target_node_id\0\u{3}message_id\0\u{3}correlation_id\0\u{3}node_hello\0\u{2}\u{2}ready\0\u{1}audio\0\u{3}reference_time\0\u{3}stop_session\0\u{4}\u{6}mapper_stream_begin\0\u{3}hit_object_token\0\u{1}error\0\u{1}status\0\u{3}end_of_stream\0")
+
+  fileprivate class _StorageClass {
+    var _sessionID: String = String()
+    var _sequence: UInt64 = 0
+    var _sentAtUnixMs: Int64 = 0
+    var _sourceNodeID: String = String()
+    var _targetNodeID: String = String()
+    var _messageID: String = String()
+    var _correlationID: String = String()
+    var _payload: Pulsefield_Protocol_V1_Envelope.OneOf_Payload?
+
+      // This property is used as the initial default value for new instances of the type.
+      // The type itself is protecting the reference to its storage via CoW semantics.
+      // This will force a copy to be made of this reference when the first mutation occurs;
+      // hence, it is safe to mark this as `nonisolated(unsafe)`.
+      static nonisolated(unsafe) let defaultInstance = _StorageClass()
+
+    private init() {}
+
+    init(copying source: _StorageClass) {
+      _sessionID = source._sessionID
+      _sequence = source._sequence
+      _sentAtUnixMs = source._sentAtUnixMs
+      _sourceNodeID = source._sourceNodeID
+      _targetNodeID = source._targetNodeID
+      _messageID = source._messageID
+      _correlationID = source._correlationID
+      _payload = source._payload
+    }
+  }
+
+  fileprivate mutating func _uniqueStorage() -> _StorageClass {
+    if !isKnownUniquelyReferenced(&_storage) {
+      _storage = _StorageClass(copying: _storage)
+    }
+    return _storage
+  }
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.sessionID) }()
-      case 2: try { try decoder.decodeSingularUInt64Field(value: &self.sequence) }()
-      case 3: try { try decoder.decodeSingularInt64Field(value: &self.sentAtUnixMs) }()
-      case 10: try {
-        var v: Pulsefield_Protocol_V1_ReadyRequest?
-        var hadOneofValue = false
-        if let current = self.payload {
-          hadOneofValue = true
-          if case .ready(let m) = current {v = m}
+    _ = _uniqueStorage()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      while let fieldNumber = try decoder.nextFieldNumber() {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every case branch when no optimizations are
+        // enabled. https://github.com/apple/swift-protobuf/issues/1034
+        switch fieldNumber {
+        case 1: try { try decoder.decodeSingularStringField(value: &_storage._sessionID) }()
+        case 2: try { try decoder.decodeSingularUInt64Field(value: &_storage._sequence) }()
+        case 3: try { try decoder.decodeSingularInt64Field(value: &_storage._sentAtUnixMs) }()
+        case 4: try { try decoder.decodeSingularStringField(value: &_storage._sourceNodeID) }()
+        case 5: try { try decoder.decodeSingularStringField(value: &_storage._targetNodeID) }()
+        case 6: try { try decoder.decodeSingularStringField(value: &_storage._messageID) }()
+        case 7: try { try decoder.decodeSingularStringField(value: &_storage._correlationID) }()
+        case 8: try {
+          var v: Pulsefield_Protocol_V1_NodeHello?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .nodeHello(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .nodeHello(v)
+          }
+        }()
+        case 10: try {
+          var v: Pulsefield_Protocol_V1_ReadyRequest?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .ready(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .ready(v)
+          }
+        }()
+        case 11: try {
+          var v: Pulsefield_Protocol_V1_AudioRequest?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .audio(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .audio(v)
+          }
+        }()
+        case 12: try {
+          var v: Pulsefield_Protocol_V1_ReferenceTimeRequest?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .referenceTime(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .referenceTime(v)
+          }
+        }()
+        case 13: try {
+          var v: Pulsefield_Protocol_V1_StopSessionRequest?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .stopSession(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .stopSession(v)
+          }
+        }()
+        case 19: try {
+          var v: Pulsefield_Protocol_V1_MapperStreamBeginEvent?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .mapperStreamBegin(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .mapperStreamBegin(v)
+          }
+        }()
+        case 20: try {
+          var v: Pulsefield_Protocol_V1_HitObjectTokenEvent?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .hitObjectToken(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .hitObjectToken(v)
+          }
+        }()
+        case 21: try {
+          var v: Pulsefield_Protocol_V1_ErrorEvent?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .error(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .error(v)
+          }
+        }()
+        case 22: try {
+          var v: Pulsefield_Protocol_V1_StatusEvent?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .status(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .status(v)
+          }
+        }()
+        case 23: try {
+          var v: Pulsefield_Protocol_V1_EndOfStreamEvent?
+          var hadOneofValue = false
+          if let current = _storage._payload {
+            hadOneofValue = true
+            if case .endOfStream(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._payload = .endOfStream(v)
+          }
+        }()
+        default: break
         }
-        try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {
-          if hadOneofValue {try decoder.handleConflictingOneOf()}
-          self.payload = .ready(v)
-        }
-      }()
-      case 11: try {
-        var v: Pulsefield_Protocol_V1_AudioRequest?
-        var hadOneofValue = false
-        if let current = self.payload {
-          hadOneofValue = true
-          if case .audio(let m) = current {v = m}
-        }
-        try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {
-          if hadOneofValue {try decoder.handleConflictingOneOf()}
-          self.payload = .audio(v)
-        }
-      }()
-      case 12: try {
-        var v: Pulsefield_Protocol_V1_ReferenceTimeRequest?
-        var hadOneofValue = false
-        if let current = self.payload {
-          hadOneofValue = true
-          if case .referenceTime(let m) = current {v = m}
-        }
-        try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {
-          if hadOneofValue {try decoder.handleConflictingOneOf()}
-          self.payload = .referenceTime(v)
-        }
-      }()
-      case 13: try {
-        var v: Pulsefield_Protocol_V1_StopSessionRequest?
-        var hadOneofValue = false
-        if let current = self.payload {
-          hadOneofValue = true
-          if case .stopSession(let m) = current {v = m}
-        }
-        try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {
-          if hadOneofValue {try decoder.handleConflictingOneOf()}
-          self.payload = .stopSession(v)
-        }
-      }()
-      case 20: try {
-        var v: Pulsefield_Protocol_V1_HitObjectTokenEvent?
-        var hadOneofValue = false
-        if let current = self.payload {
-          hadOneofValue = true
-          if case .hitObjectToken(let m) = current {v = m}
-        }
-        try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {
-          if hadOneofValue {try decoder.handleConflictingOneOf()}
-          self.payload = .hitObjectToken(v)
-        }
-      }()
-      case 21: try {
-        var v: Pulsefield_Protocol_V1_ErrorEvent?
-        var hadOneofValue = false
-        if let current = self.payload {
-          hadOneofValue = true
-          if case .error(let m) = current {v = m}
-        }
-        try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {
-          if hadOneofValue {try decoder.handleConflictingOneOf()}
-          self.payload = .error(v)
-        }
-      }()
-      case 22: try {
-        var v: Pulsefield_Protocol_V1_StatusEvent?
-        var hadOneofValue = false
-        if let current = self.payload {
-          hadOneofValue = true
-          if case .status(let m) = current {v = m}
-        }
-        try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {
-          if hadOneofValue {try decoder.handleConflictingOneOf()}
-          self.payload = .status(v)
-        }
-      }()
-      default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    if !self.sessionID.isEmpty {
-      try visitor.visitSingularStringField(value: self.sessionID, fieldNumber: 1)
-    }
-    if self.sequence != 0 {
-      try visitor.visitSingularUInt64Field(value: self.sequence, fieldNumber: 2)
-    }
-    if self.sentAtUnixMs != 0 {
-      try visitor.visitSingularInt64Field(value: self.sentAtUnixMs, fieldNumber: 3)
-    }
-    switch self.payload {
-    case .ready?: try {
-      guard case .ready(let v)? = self.payload else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 10)
-    }()
-    case .audio?: try {
-      guard case .audio(let v)? = self.payload else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 11)
-    }()
-    case .referenceTime?: try {
-      guard case .referenceTime(let v)? = self.payload else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 12)
-    }()
-    case .stopSession?: try {
-      guard case .stopSession(let v)? = self.payload else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 13)
-    }()
-    case .hitObjectToken?: try {
-      guard case .hitObjectToken(let v)? = self.payload else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 20)
-    }()
-    case .error?: try {
-      guard case .error(let v)? = self.payload else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 21)
-    }()
-    case .status?: try {
-      guard case .status(let v)? = self.payload else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 22)
-    }()
-    case nil: break
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      if !_storage._sessionID.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._sessionID, fieldNumber: 1)
+      }
+      if _storage._sequence != 0 {
+        try visitor.visitSingularUInt64Field(value: _storage._sequence, fieldNumber: 2)
+      }
+      if _storage._sentAtUnixMs != 0 {
+        try visitor.visitSingularInt64Field(value: _storage._sentAtUnixMs, fieldNumber: 3)
+      }
+      if !_storage._sourceNodeID.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._sourceNodeID, fieldNumber: 4)
+      }
+      if !_storage._targetNodeID.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._targetNodeID, fieldNumber: 5)
+      }
+      if !_storage._messageID.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._messageID, fieldNumber: 6)
+      }
+      if !_storage._correlationID.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._correlationID, fieldNumber: 7)
+      }
+      switch _storage._payload {
+      case .nodeHello?: try {
+        guard case .nodeHello(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
+      }()
+      case .ready?: try {
+        guard case .ready(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 10)
+      }()
+      case .audio?: try {
+        guard case .audio(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 11)
+      }()
+      case .referenceTime?: try {
+        guard case .referenceTime(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 12)
+      }()
+      case .stopSession?: try {
+        guard case .stopSession(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 13)
+      }()
+      case .mapperStreamBegin?: try {
+        guard case .mapperStreamBegin(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 19)
+      }()
+      case .hitObjectToken?: try {
+        guard case .hitObjectToken(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 20)
+      }()
+      case .error?: try {
+        guard case .error(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 21)
+      }()
+      case .status?: try {
+        guard case .status(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 22)
+      }()
+      case .endOfStream?: try {
+        guard case .endOfStream(let v)? = _storage._payload else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 23)
+      }()
+      case nil: break
+      }
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Pulsefield_Protocol_V1_Envelope, rhs: Pulsefield_Protocol_V1_Envelope) -> Bool {
-    if lhs.sessionID != rhs.sessionID {return false}
-    if lhs.sequence != rhs.sequence {return false}
-    if lhs.sentAtUnixMs != rhs.sentAtUnixMs {return false}
-    if lhs.payload != rhs.payload {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-nonisolated extension Pulsefield_Protocol_V1_ReadyRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".ReadyRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    // Load everything into unknown fields
-    while try decoder.nextFieldNumber() != nil {}
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Pulsefield_Protocol_V1_ReadyRequest, rhs: Pulsefield_Protocol_V1_ReadyRequest) -> Bool {
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-nonisolated extension Pulsefield_Protocol_V1_AudioRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".AudioRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}audio_path\0\u{3}audio_length_ms\0\u{3}music_source\0\u{1}difficulty\0\u{1}route\0")
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.audioPath) }()
-      case 2: try { try decoder.decodeSingularUInt32Field(value: &self._audioLengthMs) }()
-      case 3: try { try decoder.decodeSingularEnumField(value: &self.musicSource) }()
-      case 4: try { try decoder.decodeSingularDoubleField(value: &self._difficulty) }()
-      case 5: try { try decoder.decodeSingularEnumField(value: &self.route) }()
-      default: break
+    if lhs._storage !== rhs._storage {
+      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
+        let _storage = _args.0
+        let rhs_storage = _args.1
+        if _storage._sessionID != rhs_storage._sessionID {return false}
+        if _storage._sequence != rhs_storage._sequence {return false}
+        if _storage._sentAtUnixMs != rhs_storage._sentAtUnixMs {return false}
+        if _storage._sourceNodeID != rhs_storage._sourceNodeID {return false}
+        if _storage._targetNodeID != rhs_storage._targetNodeID {return false}
+        if _storage._messageID != rhs_storage._messageID {return false}
+        if _storage._correlationID != rhs_storage._correlationID {return false}
+        if _storage._payload != rhs_storage._payload {return false}
+        return true
       }
+      if !storagesAreEqual {return false}
     }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    if !self.audioPath.isEmpty {
-      try visitor.visitSingularStringField(value: self.audioPath, fieldNumber: 1)
-    }
-    try { if let v = self._audioLengthMs {
-      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    } }()
-    if self.musicSource != .unspecified {
-      try visitor.visitSingularEnumField(value: self.musicSource, fieldNumber: 3)
-    }
-    try { if let v = self._difficulty {
-      try visitor.visitSingularDoubleField(value: v, fieldNumber: 4)
-    } }()
-    if self.route != .unspecified {
-      try visitor.visitSingularEnumField(value: self.route, fieldNumber: 5)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Pulsefield_Protocol_V1_AudioRequest, rhs: Pulsefield_Protocol_V1_AudioRequest) -> Bool {
-    if lhs.audioPath != rhs.audioPath {return false}
-    if lhs._audioLengthMs != rhs._audioLengthMs {return false}
-    if lhs.musicSource != rhs.musicSource {return false}
-    if lhs._difficulty != rhs._difficulty {return false}
-    if lhs.route != rhs.route {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-nonisolated extension Pulsefield_Protocol_V1_ReferenceTimeRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".ReferenceTimeRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}ref_time_ms\0\u{3}local_host_time_send_ms\0\u{3}audio_length_ms\0")
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.refTimeMs) }()
-      case 2: try { try decoder.decodeSingularDoubleField(value: &self.localHostTimeSendMs) }()
-      case 3: try { try decoder.decodeSingularUInt32Field(value: &self._audioLengthMs) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    if self.refTimeMs != 0 {
-      try visitor.visitSingularUInt32Field(value: self.refTimeMs, fieldNumber: 1)
-    }
-    if self.localHostTimeSendMs.bitPattern != 0 {
-      try visitor.visitSingularDoubleField(value: self.localHostTimeSendMs, fieldNumber: 2)
-    }
-    try { if let v = self._audioLengthMs {
-      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    } }()
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Pulsefield_Protocol_V1_ReferenceTimeRequest, rhs: Pulsefield_Protocol_V1_ReferenceTimeRequest) -> Bool {
-    if lhs.refTimeMs != rhs.refTimeMs {return false}
-    if lhs.localHostTimeSendMs != rhs.localHostTimeSendMs {return false}
-    if lhs._audioLengthMs != rhs._audioLengthMs {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-nonisolated extension Pulsefield_Protocol_V1_StopSessionRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".StopSessionRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}reason\0")
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.reason) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.reason.isEmpty {
-      try visitor.visitSingularStringField(value: self.reason, fieldNumber: 1)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Pulsefield_Protocol_V1_StopSessionRequest, rhs: Pulsefield_Protocol_V1_StopSessionRequest) -> Bool {
-    if lhs.reason != rhs.reason {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-nonisolated extension Pulsefield_Protocol_V1_HitObjectTokenEvent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".HitObjectTokenEvent"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}token_id\0\u{3}ms_in_ref_audio\0")
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.tokenID) }()
-      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.msInRefAudio) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.tokenID != 0 {
-      try visitor.visitSingularUInt32Field(value: self.tokenID, fieldNumber: 1)
-    }
-    if self.msInRefAudio != 0 {
-      try visitor.visitSingularUInt32Field(value: self.msInRefAudio, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Pulsefield_Protocol_V1_HitObjectTokenEvent, rhs: Pulsefield_Protocol_V1_HitObjectTokenEvent) -> Bool {
-    if lhs.tokenID != rhs.tokenID {return false}
-    if lhs.msInRefAudio != rhs.msInRefAudio {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-nonisolated extension Pulsefield_Protocol_V1_ErrorEvent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".ErrorEvent"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}code\0\u{1}message\0")
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.code) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.message) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.code.isEmpty {
-      try visitor.visitSingularStringField(value: self.code, fieldNumber: 1)
-    }
-    if !self.message.isEmpty {
-      try visitor.visitSingularStringField(value: self.message, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Pulsefield_Protocol_V1_ErrorEvent, rhs: Pulsefield_Protocol_V1_ErrorEvent) -> Bool {
-    if lhs.code != rhs.code {return false}
-    if lhs.message != rhs.message {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-nonisolated extension Pulsefield_Protocol_V1_StatusEvent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".StatusEvent"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}status\0\u{1}message\0\u{3}ref_time_ms\0\u{3}local_host_time_ms\0")
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularEnumField(value: &self.status) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.message) }()
-      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.refTimeMs) }()
-      case 4: try { try decoder.decodeSingularDoubleField(value: &self.localHostTimeMs) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.status != .unspecified {
-      try visitor.visitSingularEnumField(value: self.status, fieldNumber: 1)
-    }
-    if !self.message.isEmpty {
-      try visitor.visitSingularStringField(value: self.message, fieldNumber: 2)
-    }
-    if self.refTimeMs != 0 {
-      try visitor.visitSingularUInt32Field(value: self.refTimeMs, fieldNumber: 3)
-    }
-    if self.localHostTimeMs.bitPattern != 0 {
-      try visitor.visitSingularDoubleField(value: self.localHostTimeMs, fieldNumber: 4)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Pulsefield_Protocol_V1_StatusEvent, rhs: Pulsefield_Protocol_V1_StatusEvent) -> Bool {
-    if lhs.status != rhs.status {return false}
-    if lhs.message != rhs.message {return false}
-    if lhs.refTimeMs != rhs.refTimeMs {return false}
-    if lhs.localHostTimeMs != rhs.localHostTimeMs {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

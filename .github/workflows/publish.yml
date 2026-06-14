@@ -4,15 +4,21 @@ on:
   push:
     tags:
       - "v*.*.*"
+      - "*.*.*"
   workflow_dispatch:
 
 permissions:
   contents: read
   id-token: write
 
+env:
+  npm_config_audit: "false"
+  npm_config_fund: "false"
+  npm_config_prefer_offline: "true"
+
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: npm
 
     steps:
@@ -22,13 +28,11 @@ jobs:
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
-          package-manager-cache: false
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       - run: npm ci
-      - run: npm run proto:generate
-      - run: git diff --exit-code
       - run: npm run check
-      - run: npm test
       - run: npm run format
       - run: npm pack --dry-run
       - run: npm publish

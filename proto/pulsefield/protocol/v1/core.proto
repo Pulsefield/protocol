@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package pulsefield.protocol.v1;
+
+// Capability advertised by a node before domain-specific traffic begins.
+message NodeCapability {
+  NodeCapabilityKind kind = 1;
+
+  // Stable capability identifier, such as "mapper.tuple_tokens" or "hardware.input".
+  string name = 2;
+
+  // Capability-specific contract or implementation version.
+  string version = 3;
+  NodeCapabilityDirection direction = 4;
+}
+
+// Initial topology announcement for apps, services, tools, and hardware bridges.
+message NodeHello {
+  // Stable node identifier within a Pulsefield graph or room.
+  string node_id = 1;
+
+  NodeRole role = 2;
+
+  repeated NodeCapability capabilities = 3;
+
+  // Protocol package version spoken by this node, such as "0.0.3".
+  string protocol_version = 4;
+
+  // Stable application or service identifier, such as "pulsefield.host".
+  string app_id = 5;
+}
+
+enum NodeRole {
+  NODE_ROLE_UNSPECIFIED = 0;
+  NODE_ROLE_HOST = 1;
+  NODE_ROLE_PLAYER_CLIENT = 2;
+  NODE_ROLE_MODEL_SERVICE = 3;
+  NODE_ROLE_HARDWARE = 4;
+  NODE_ROLE_DEBUG_TOOL = 5;
+}
+
+enum NodeCapabilityKind {
+  NODE_CAPABILITY_KIND_UNSPECIFIED = 0;
+  NODE_CAPABILITY_KIND_RECOGNITION = 1;
+  NODE_CAPABILITY_KIND_TIMING = 2;
+  NODE_CAPABILITY_KIND_MAPPER = 3;
+  NODE_CAPABILITY_KIND_PLAYER_STREAM = 4;
+  NODE_CAPABILITY_KIND_HARDWARE = 5;
+  NODE_CAPABILITY_KIND_DEBUG = 6;
+}
+
+enum NodeCapabilityDirection {
+  NODE_CAPABILITY_DIRECTION_UNSPECIFIED = 0;
+  NODE_CAPABILITY_DIRECTION_PRODUCER = 1;
+  NODE_CAPABILITY_DIRECTION_CONSUMER = 2;
+  NODE_CAPABILITY_DIRECTION_BIDIRECTIONAL = 3;
+}

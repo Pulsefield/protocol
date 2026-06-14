@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package pulsefield.protocol.v1;
+
+// Sent by a client to ask the endpoint to load models and become ready.
+message ReadyRequest {}
+
+message AudioAssetRef {
+  oneof ref {
+    string local_path = 1;
+    string uri = 2;
+    string asset_id = 3;
+  }
+
+  optional uint32 audio_length_ms = 10;
+  optional string sha256_hex = 11;
+}
+
+message AudioRequest {
+  AudioAssetRef audio = 1;
+  SyncSource sync_source = 2;
+  optional double difficulty = 3;
+  InferenceRoute route = 4;
+}
+
+// Sent by a client once ambient sync has produced a reference clock lock.
+message ReferenceTimeRequest {
+  // Current playback/reference position in the selected audio, in milliseconds.
+  uint32 ref_time_ms = 1;
+
+  // Client monotonic host-clock timestamp captured when ref_time_ms was sent.
+  uint64 local_host_time_send_ms = 2;
+
+  // Duration check in milliseconds. When present, it must match AudioRequest.
+  optional uint32 audio_length_ms = 3;
+}
+
+// Sent by a client to stop and reset an active endpoint session.
+message StopSessionRequest {
+  // Machine-readable stop reason such as "client_stop" or "peer_disconnect".
+  string reason = 1;
+}
+
+// Machine-readable endpoint failure plus a human-readable message.
+message ErrorEvent {
+  // Stable string code retained for JSON compatibility with prototype clients.
+  string code = 1;
+
+  string message = 2;
+
+  // Preferred typed error code for new protobuf consumers.
+  InferenceErrorCode error_code = 3;
+
+  // Endpoint phase that failed, such as "prepare_audio" or "stream".
+  string phase = 4;
+
+  // Route active when the failure occurred, when known.
+  InferenceRoute route = 5;
+
+  // Compatibility bucket used by the current JSON endpoint, such as "inference".
+  string error_kind = 6;
+}
+
+// Endpoint lifecycle transition or current-status notification.
+message StatusEvent {
+  // Target status after this notification.
+  EndpointStatus status = 1;
+
+  string message = 2;
+
+  // Reference-audio position associated with the status, when known.
+  optional uint32 ref_time_ms = 3;
+
+  // Sender-local monotonic host-clock timestamp in milliseconds, when known.
+  optional uint64 sender_monotonic_ms = 4;
+
+  // Previous status for transition logs.
+  EndpointStatus from_status = 5;
+
+  // Machine-readable transition reason such as "audio_path" or "reference_time".
+  string reason = 6;
+
+  // Selected audio duration associated with this transition, when known.
+  optional uint32 audio_length_ms = 7;
+
+  // Host-clock deadline for automatic cleanup after audio end, when scheduled.
+  optional uint64 reset_sender_monotonic_ms = 8;
+
+  // Route active for this status transition, when relevant.
+  InferenceRoute route = 9;
+
+  // User-facing difficulty associated with mapper preparation, when relevant.
+  optional double difficulty = 10;
+}
+
+// Sent by the model service after all tokens through complete_through_ms were emitted.
+message EndOfStreamEvent {
+  // Selected audio duration in milliseconds.
+  optional uint32 audio_length_ms = 1;
+
+  // Reference-audio time through which the stream is complete.
+  uint32 complete_through_ms = 2;
+}
+
+enum SyncSource {
+  SYNC_SOURCE_UNSPECIFIED = 0;
+  SYNC_SOURCE_BACKGROUND = 1;
+  SYNC_SOURCE_SYSTEM_AUDIO = 2;
+}
+
+enum InferenceRoute {
+  INFERENCE_ROUTE_UNSPECIFIED = 0;
+  INFERENCE_ROUTE_MAPPER = 1;
+
+  // Timing-only route selected by the legacy JSON is_mock/isMock flag.
+  INFERENCE_ROUTE_TIMING_MOCK = 2;
+}
+
+enum EndpointStatus {
+  ENDPOINT_STATUS_UNSPECIFIED = 0;
+  ENDPOINT_STATUS_READY = 1;
+  ENDPOINT_STATUS_AUDIO_PREPARING = 2;
+  ENDPOINT_STATUS_AUDIO_READY = 3;
+  ENDPOINT_STATUS_STREAMING = 4;
+  ENDPOINT_STATUS_STOPPED = 5;
+  ENDPOINT_STATUS_FAILED = 6;
+
+  // Endpoint has not completed initial readiness startup.
+  ENDPOINT_STATUS_COLD = 7;
+
+  // No active session exists for the envelope session_id.
+  ENDPOINT_STATUS_NO_SESSION = 8;
+}
+
+enum InferenceErrorCode {
+  INFERENCE_ERROR_CODE_UNSPECIFIED = 0;
+  INFERENCE_ERROR_CODE_PROTOCOL_ERROR = 1;
+  INFERENCE_ERROR_CODE_INVALID_DEVICE = 2;
+  INFERENCE_ERROR_CODE_AUDIO_NOT_FOUND = 3;
+  INFERENCE_ERROR_CODE_INFERENCE_FAILED = 4;
+  INFERENCE_ERROR_CODE_SESSION_NOT_FOUND = 5;
+  INFERENCE_ERROR_CODE_SESSION_OWNERSHIP_CONFLICT = 6;
+  INFERENCE_ERROR_CODE_AUDIO_NOT_PREPARED = 7;
+  INFERENCE_ERROR_CODE_UNSUPPORTED_ROUTE = 8;
+}
